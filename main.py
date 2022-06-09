@@ -1,6 +1,8 @@
 import requests
 from pathlib import Path
 from urllib.error import HTTPError
+from bs4 import BeautifulSoup
+
 
 
 def creating_folder(folder):
@@ -29,11 +31,19 @@ def check_for_redirect(response):
         raise requests.exceptions.HTTPError
 
 
+def get_book_info():
+    url = 'https://tululu.org/b1/'
+    response = requests.get(url)
+    response.raise_for_status()
+    soup = BeautifulSoup(response.text, 'lxml')
+    name = soup.find('h1').text.split('::')[0].strip()
+    author = soup.find('h1').text.split('::')[1].strip()
 def main():
     folder = 'books'
 
     creating_folder(folder)
-    downloading_books(folder)
+    # downloading_books(folder)
+    get_book_info()
 
 
 if __name__ == "__main__":
