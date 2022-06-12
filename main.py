@@ -32,7 +32,7 @@ def download_txt(response, filename, folder='books/'):
         file.write(response.content)
 
 
-def get_book_image(url):
+def get_book_image_url(url):
     response = requests.get(url)
     response.raise_for_status()
     soup = BeautifulSoup(response.text, 'lxml')
@@ -41,7 +41,13 @@ def get_book_image(url):
     return image_link
 
 
-def download_image(image_link)
+def download_image(image_link, folder='images/'):
+    response = requests.get(image_link)
+    response.raise_for_status()
+    image_name = image_link.split('/')[-1]
+    filepath = os.path.join(folder, image_name)
+    with open(filepath, 'wb') as file:
+        file.write(response.content)
 
 
 def main():
@@ -61,7 +67,8 @@ def main():
             check_for_redirect(response)
             book_name = get_book_info(book_url.format(book_id))
             # download_txt(response, book_name)
-            print(get_book_image(book_url.format(book_id)))
+            image_link = get_book_image_url(book_url.format(book_id))
+            download_image(image_link)
         except requests.exceptions.HTTPError:
             print(f'Книги с id{book_id} не существует')
 
