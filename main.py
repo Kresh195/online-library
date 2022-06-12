@@ -4,6 +4,7 @@ from pathlib import Path
 from urllib.error import HTTPError
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
+from urllib.parse import urljoin
 
 
 def creating_folder(folder):
@@ -31,11 +32,25 @@ def download_txt(response, filename, folder='books/'):
         file.write(response.content)
 
 
+def get_book_image(url):
+    response = requests.get(url)
+    response.raise_for_status()
+    soup = BeautifulSoup(response.text, 'lxml')
+    image_link_part = soup.find('div', class_='bookimage').find('img')['src']
+    image_link = urljoin('https://tululu.org', image_link_part)
+    return image_link
+
+
+def download_image(image_link)
+
+
 def main():
-    folder = 'books'
+    books_folder = 'books'
+    images_folder = 'images'
     books_downloading_url = 'https://tululu.org/txt.php'
     book_url = 'https://tululu.org/b{}/'
-    creating_folder(folder)
+    creating_folder(books_folder)
+    creating_folder(images_folder)
     for book_id in range(1, 11):
         params = {
             'id': book_id
@@ -45,7 +60,8 @@ def main():
             response.raise_for_status()
             check_for_redirect(response)
             book_name = get_book_info(book_url.format(book_id))
-            download_txt(response, book_name)
+            # download_txt(response, book_name)
+            print(get_book_image(book_url.format(book_id)))
         except requests.exceptions.HTTPError:
             print(f'Книги с id{book_id} не существует')
 
