@@ -50,6 +50,16 @@ def download_image(image_link, folder='images/'):
         file.write(response.content)
 
 
+def download_comments(url):
+    response = requests.get(url)
+    response.raise_for_status()
+    soup = BeautifulSoup(response.text, 'lxml')
+    comments = soup.find_all('div', class_='texts')
+    comments_list = [comment_book.find('span', class_='black').text for comment_book in comments]
+    print(comments_list)
+    print('11111111111111')
+
+
 def main():
     books_folder = 'books'
     images_folder = 'images'
@@ -69,6 +79,7 @@ def main():
             # download_txt(response, book_name)
             image_link = get_book_image_url(book_url.format(book_id))
             download_image(image_link)
+            download_comments(book_url.format(book_id))
         except requests.exceptions.HTTPError:
             print(f'Книги с id{book_id} не существует')
 
