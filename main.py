@@ -56,8 +56,16 @@ def download_comments(url):
     soup = BeautifulSoup(response.text, 'lxml')
     comments = soup.find_all('div', class_='texts')
     comments_list = [comment_book.find('span', class_='black').text for comment_book in comments]
-    print(comments_list)
-    print('11111111111111')
+    return comments_list
+
+
+def get_book_genres(url):
+    response = requests.get(url)
+    response.raise_for_status()
+    soup = BeautifulSoup(response.text, 'lxml')
+    genres = soup.find('span', class_='d_book').find_all('a')
+    genres = [genre.text for genre in genres]
+    return genres
 
 
 def main():
@@ -79,7 +87,8 @@ def main():
             # download_txt(response, book_name)
             image_link = get_book_image_url(book_url.format(book_id))
             download_image(image_link)
-            download_comments(book_url.format(book_id))
+            comments = download_comments(book_url.format(book_id))
+            genres = get_book_genres(book_url.format(book_id))
         except requests.exceptions.HTTPError:
             print(f'Книги с id{book_id} не существует')
 
