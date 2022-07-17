@@ -22,7 +22,7 @@ def get_book_info(url):
     soup = BeautifulSoup(response.text, 'lxml')
     name = soup.find('h1').text.split('::')[0].strip()
     author = soup.find('h1').text.split('::')[1].strip()
-    return name
+    return name, author
 
 
 def download_txt(response, filename, folder='books/'):
@@ -68,6 +68,22 @@ def get_book_genres(url):
     return genres
 
 
+def parse_book_page(book_url, book_id):
+    url = book_url.format(book_id)
+    name, author = get_book_info(url)
+    genres = get_book_genres(url)
+    comments = download_comments(url)
+    image_link = get_book_image_url(url)
+    book_page_info = {
+        'name': name,
+        'authoenr': author,
+        'genres': genres,
+        'comments': comments,
+        'image_link': image_link
+    }
+    return book_page_info
+
+
 def main():
     books_folder = 'books'
     images_folder = 'images'
@@ -86,9 +102,10 @@ def main():
             book_name = get_book_info(book_url.format(book_id))
             # download_txt(response, book_name)
             image_link = get_book_image_url(book_url.format(book_id))
-            download_image(image_link)
+            # download_image(image_link)
             comments = download_comments(book_url.format(book_id))
             genres = get_book_genres(book_url.format(book_id))
+            print(parse_book_page(book_url, book_id))
         except requests.exceptions.HTTPError:
             print(f'Книги с id{book_id} не существует')
 
