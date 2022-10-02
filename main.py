@@ -5,6 +5,7 @@ from urllib.error import HTTPError
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 from urllib.parse import urljoin
+import argparse
 
 
 def creating_folder(folder):
@@ -89,9 +90,15 @@ def main():
     images_folder = 'images'
     books_downloading_url = 'https://tululu.org/txt.php'
     book_url = 'https://tululu.org/b{}/'
+    parser = argparse.ArgumentParser(description='Программа скачивает книги из онлайн-библиотеки')
+    parser.add_argument('--start_id', default=1, type=int)
+    parser.add_argument('--end_id', default=11, type=int)
+    args = parser.parse_args()
+    start_id = args.start_id
+    end_id = args.end_id
     creating_folder(books_folder)
     creating_folder(images_folder)
-    for book_id in range(1, 11):
+    for book_id in range(start_id, end_id):
         params = {
             'id': book_id
         }
@@ -99,13 +106,11 @@ def main():
         try:
             response.raise_for_status()
             check_for_redirect(response)
-            book_name = get_book_info(book_url.format(book_id))
-            # download_txt(response, book_name)
-            image_link = get_book_image_url(book_url.format(book_id))
-            # download_image(image_link)
-            comments = download_comments(book_url.format(book_id))
-            genres = get_book_genres(book_url.format(book_id))
-            print(parse_book_page(book_url, book_id))
+            page_info = parse_book_page(book_url, book_id)
+            book_name = page_info['name']
+            download_txt(response, book_name)
+            image_link = page_info['image_link']
+            download_image(image_link)
         except requests.exceptions.HTTPError:
             print(f'Книги с id{book_id} не существует')
 
