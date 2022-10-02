@@ -1,15 +1,12 @@
-import requests
 import os
+import argparse
+from urllib.parse import urljoin
+from time import sleep
+
+import requests
 from pathlib import Path
-from urllib.error import HTTPError
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
-from urllib.parse import urljoin
-import argparse
-
-
-def creating_folder(folder):
-    Path(folder).mkdir(parents=True, exist_ok=True)
 
 
 def check_for_redirect(response):
@@ -94,11 +91,9 @@ def main():
     parser.add_argument('--start_id', default=1, type=int)
     parser.add_argument('--end_id', default=11, type=int)
     args = parser.parse_args()
-    start_id = args.start_id
-    end_id = args.end_id
-    creating_folder(books_folder)
-    creating_folder(images_folder)
-    for book_id in range(start_id, end_id):
+    Path(books_folder).mkdir(parents=True, exist_ok=True)
+    Path(images_folder).mkdir(parents=True, exist_ok=True)
+    for book_id in range(args.start_id, args.end_id):
         params = {
             'id': book_id
         }
@@ -113,6 +108,9 @@ def main():
             download_image(image_link)
         except requests.exceptions.HTTPError:
             print(f'Книги с id{book_id} не существует')
+        except requests.exceptions.ConnectionError:
+            print('Повторное подключение')
+            sleep(20)
 
 
 if __name__ == "__main__":
