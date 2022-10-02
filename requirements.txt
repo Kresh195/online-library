@@ -1,0 +1,4 @@
+beautifulsoup4     4.11.1
+pathvalidate       2.5.0
+requests           2.27.1
+sanitize-filename  1.2.0
