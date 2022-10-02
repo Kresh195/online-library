@@ -93,7 +93,7 @@ def main():
     args = parser.parse_args()
     Path(books_folder).mkdir(parents=True, exist_ok=True)
     Path(images_folder).mkdir(parents=True, exist_ok=True)
-    for book_id in range(args.start_id, args.end_id):
+    for book_id in range(args.start_id, args.end_id + 1):
         params = {
             'id': book_id
         }
