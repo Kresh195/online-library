@@ -14,13 +14,13 @@ def check_for_redirect(response):
         raise requests.exceptions.HTTPError
 
 
-def get_book_info(url):
+def get_book_title_and_author(url):
     response = requests.get(url)
     response.raise_for_status()
     soup = BeautifulSoup(response.text, 'lxml')
-    name = soup.find('h1').text.split('::')[0].strip()
+    title = soup.find('h1').text.split('::')[0].strip()
     author = soup.find('h1').text.split('::')[1].strip()
-    return name, author
+    return title, author
 
 
 def download_txt(response, filename, folder='books/'):
@@ -53,8 +53,8 @@ def download_comments(url):
     response.raise_for_status()
     soup = BeautifulSoup(response.text, 'lxml')
     comments = soup.find_all('div', class_='texts')
-    comments_list = [comment_book.find('span', class_='black').text for comment_book in comments]
-    return comments_list
+    comments = [comment_book.find('span', class_='black').text for comment_book in comments]
+    return comments
 
 
 def get_book_genres(url):
@@ -68,18 +68,18 @@ def get_book_genres(url):
 
 def parse_book_page(book_url, book_id):
     url = book_url.format(book_id)
-    name, author = get_book_info(url)
+    title, author = get_book_title_and_author(url)
     genres = get_book_genres(url)
     comments = download_comments(url)
     image_link = get_book_image_url(url)
-    book_page_info = {
-        'name': name,
-        'authoenr': author,
+    all_about_book = {
+        'title': title,
+        'author': author,
         'genres': genres,
         'comments': comments,
         'image_link': image_link
     }
-    return book_page_info
+    return all_about_book
 
 
 def main():
@@ -101,10 +101,9 @@ def main():
         try:
             response.raise_for_status()
             check_for_redirect(response)
-            page_info = parse_book_page(book_url, book_id)
-            book_name = page_info['name']
-            download_txt(response, book_name)
-            image_link = page_info['image_link']
+            book_title = parse_book_page(book_url, book_id)['title']
+            download_txt(response, book_title)
+            image_link = parse_book_page(book_url, book_id)['image_link']
             download_image(image_link)
         except requests.exceptions.HTTPError:
             print(f'Книги с id{book_id} не существует')
