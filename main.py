@@ -14,13 +14,21 @@ def check_for_redirect(response):
         raise requests.exceptions.HTTPError
 
 
-def get_book_title_and_author(url):
+def get_book_title(soup):
+    title = soup.find('h1').text.split('::')[0].strip()
+    return title
+
+
+def get_book_author(soup):
+    author = soup.find('h1').text.split('::')[1].strip()
+    return author
+
+
+def get_book_soup(url):
     response = requests.get(url)
     response.raise_for_status()
     soup = BeautifulSoup(response.text, 'lxml')
-    title = soup.find('h1').text.split('::')[0].strip()
-    author = soup.find('h1').text.split('::')[1].strip()
-    return title, author
+    return soup
 
 
 def download_txt(response, filename, folder='books/'):
@@ -30,10 +38,7 @@ def download_txt(response, filename, folder='books/'):
         file.write(response.content)
 
 
-def get_book_image_url(url):
-    response = requests.get(url)
-    response.raise_for_status()
-    soup = BeautifulSoup(response.text, 'lxml')
+def get_book_image_url(soup):
     image_link_part = soup.find('div', class_='bookimage').find('img')['src']
     image_link = urljoin('https://tululu.org', image_link_part)
     return image_link
@@ -48,19 +53,13 @@ def download_image(image_link, folder='images/'):
         file.write(response.content)
 
 
-def download_comments(url):
-    response = requests.get(url)
-    response.raise_for_status()
-    soup = BeautifulSoup(response.text, 'lxml')
+def download_comments(soup):
     comments = soup.find_all('div', class_='texts')
     comments = [comment_book.find('span', class_='black').text for comment_book in comments]
     return comments
 
 
-def get_book_genres(url):
-    response = requests.get(url)
-    response.raise_for_status()
-    soup = BeautifulSoup(response.text, 'lxml')
+def get_book_genres(soup):
     genres = soup.find('span', class_='d_book').find_all('a')
     genres = [genre.text for genre in genres]
     return genres
@@ -68,10 +67,12 @@ def get_book_genres(url):
 
 def parse_book_page(book_url, book_id):
     url = book_url.format(book_id)
-    title, author = get_book_title_and_author(url)
-    genres = get_book_genres(url)
-    comments = download_comments(url)
-    image_link = get_book_image_url(url)
+    soup = get_book_soup(url)
+    title = get_book_title(soup)
+    author = get_book_author(soup)
+    genres = get_book_genres(soup)
+    comments = download_comments(soup)
+    image_link = get_book_image_url(soup)
     all_about_book = {
         'title': title,
         'author': author,
