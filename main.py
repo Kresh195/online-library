@@ -14,21 +14,18 @@ def check_for_redirect(response):
         raise requests.exceptions.HTTPError
 
 
-def get_book_title(soup):
-    title = soup.find('h1').text.split('::')[0].strip()
-    return title
-
-
-def get_book_author(soup):
-    author = soup.find('h1').text.split('::')[1].strip()
-    return author
-
-
 def get_book_soup(url):
     response = requests.get(url)
     response.raise_for_status()
     soup = BeautifulSoup(response.text, 'lxml')
     return soup
+
+
+def get_book_headers(soup):
+    title, author = soup.find('h1').text.split('::')
+    title = title.strip()
+    author = author.strip()
+    return title, author
 
 
 def download_txt(response, filename, folder='books/'):
@@ -68,8 +65,7 @@ def get_book_genres(soup):
 def parse_book_page(book_url, book_id):
     url = book_url.format(book_id)
     soup = get_book_soup(url)
-    title = get_book_title(soup)
-    author = get_book_author(soup)
+    title, author = get_book_headers(soup)
     genres = get_book_genres(soup)
     comments = download_comments(soup)
     image_link = get_book_image_url(soup)
