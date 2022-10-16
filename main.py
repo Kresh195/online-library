@@ -35,9 +35,9 @@ def download_txt(response, filename, folder='books/'):
         file.write(response.content)
 
 
-def get_book_image_url(soup):
+def get_book_image_url(soup, url):
     image_link_part = soup.find('div', class_='bookimage').find('img')['src']
-    image_link = urljoin('https://tululu.org', image_link_part)
+    image_link = urljoin(url, image_link_part)
     return image_link
 
 
@@ -68,7 +68,7 @@ def parse_book_page(book_url, book_id):
     title, author = get_book_headers(soup)
     genres = get_book_genres(soup)
     comments = download_comments(soup)
-    image_link = get_book_image_url(soup)
+    image_link = get_book_image_url(soup, url)
     all_about_book = {
         'title': title,
         'author': author,
