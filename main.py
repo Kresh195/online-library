@@ -62,21 +62,19 @@ def get_book_genres(soup):
     return genres
 
 
-def parse_book_page(book_url, book_id):
-    url = book_url.format(book_id)
-    soup = get_book_soup(url)
+def parse_book_page(soup, url):
     title, author = get_book_headers(soup)
     genres = get_book_genres(soup)
     comments = download_comments(soup)
     image_link = get_book_image_url(soup, url)
-    all_about_book = {
+    book = {
         'title': title,
         'author': author,
         'genres': genres,
         'comments': comments,
         'image_link': image_link
     }
-    return all_about_book
+    return book
 
 
 def main():
@@ -95,12 +93,15 @@ def main():
             'id': book_id
         }
         response = requests.get(books_downloading_url, params=params)
+        url = book_url.format(book_id)
+        soup = get_book_soup(url)
         try:
             response.raise_for_status()
             check_for_redirect(response)
-            book_title = parse_book_page(book_url, book_id)['title']
+            book = parse_book_page(soup, url)
+            book_title = book['title']
             download_txt(response, book_title)
-            image_link = parse_book_page(book_url, book_id)['image_link']
+            image_link = book['image_link']
             download_image(image_link)
         except requests.exceptions.HTTPError:
             print(f'Книги с id{book_id} не существует')
