@@ -13,13 +13,11 @@ def get_soup(url):
 
 def get_books_urls():
     url = "https://tululu.org/l55/"
-    url_list = []
+    books_selector = "table.d_book"
     for page in range(1, 2):
         url = urljoin(url, f"{page}")
         soup = get_soup(url)
-        books = soup.find("td", class_="ow_px_td").find_all("table")
-        for book in books:
-            book_id = book.find("a")["href"]
-            book_url = urljoin(url, book_id)
-            url_list.append(book_url)
+        books = soup.select(books_selector)
+        url_list = [urljoin(url, book.find('a')['href']) for book in books]
     return url_list
+

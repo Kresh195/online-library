@@ -10,7 +10,6 @@ from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 
 from parse_tululu_category import get_books_urls
-from pprint import pprint
 
 def check_for_redirect(response):
     if response.history:
@@ -25,7 +24,7 @@ def get_book_soup(url):
 
 
 def get_book_headers(soup):
-    title, author = soup.find('h1').text.split('::')
+    title, author = soup.select_one('h1').text.split('::')
     title = title.strip()
     author = author.strip()
     return title, author
@@ -40,7 +39,7 @@ def download_txt(response, book_name, folder='books/'):
 
 
 def get_book_image_url(soup, url):
-    image_link_part = soup.find('div', class_='bookimage').find('img')['src']
+    image_link_part = soup.select_one('div.bookimage img')['src']
     image_link = urljoin(url, image_link_part)
     return image_link
 
@@ -57,19 +56,19 @@ def download_image(soup, url, folder='images/'):
 
 
 def download_comments(soup):
-    comments = soup.find_all('div', class_='texts')
-    comments = [comment_book.find('span', class_='black').text for comment_book in comments]
+    comments = soup.select('div.texts')
+    comments = [comment_book.select_one('span.black').text for comment_book in comments]
     return comments
 
 
 def get_book_genres(soup):
-    genres = soup.find('span', class_='d_book').find_all('a')
+    genres = soup.select('span.d_book a')
     genres = [genre.text for genre in genres]
     return genres
 
 
 def get_book_descriptions(soup):
-    description = soup.find_all('table', class_='d_book')[1]
+    description = soup.select('table.d_book')[1]
     description = description.text
     return description
 
