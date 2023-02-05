@@ -92,9 +92,13 @@ def main():
     books_folder = 'books'
     images_folder = 'images'
     books_downloading_url = 'https://tululu.org/txt.php'
+    parser = argparse.ArgumentParser(description='Программа скачивает книги из онлайн-библиотеки')
+    parser.add_argument('--first_page', default=1, type=int)
+    parser.add_argument('--last_page', default=3, type=int)
+    args = parser.parse_args()
     Path(books_folder).mkdir(parents=True, exist_ok=True)
     Path(images_folder).mkdir(parents=True, exist_ok=True)
-    url_list = get_books_urls()
+    url_list = get_books_urls(args.first_page, args.last_page)
     books = list()
     for url in url_list:
         book_id = int(url.split('b')[1].split('/')[0])
