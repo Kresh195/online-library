@@ -2,7 +2,8 @@
 .idea
 vvenv
 __pycache__
-books
-images
+media/books
+media/images
 books.json
+media
 
