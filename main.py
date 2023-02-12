@@ -30,7 +30,7 @@ def get_book_headers(soup):
     return title, author
 
 
-def download_txt(response, book_name, folder='books/'):
+def download_txt(response, book_name, folder='media/books/'):
     txt_name = f'{sanitize_filename(book_name)}.txt'
     book_path = os.path.join(folder, txt_name)
     with open(book_path, 'wb') as file:
@@ -44,7 +44,7 @@ def get_book_image_url(soup, url):
     return image_link
 
 
-def download_image(soup, url, folder='images/'):
+def download_image(soup, url, folder='media/images/'):
     image_link = get_book_image_url(soup, url)
     response = requests.get(image_link)
     response.raise_for_status()
@@ -93,14 +93,49 @@ def main():
     images_folder = 'images'
     books_downloading_url = 'https://tululu.org/txt.php'
     parser = argparse.ArgumentParser(description='Программа скачивает книги из онлайн-библиотеки')
-    parser.add_argument('--first_page', default=1, type=int)
-    parser.add_argument('--last_page', default=3, type=int)
+    parser.add_argument(
+        '--first_page',
+        '--start_page',
+        default=1,
+        type=int,
+        help='Первая страница для загрузки книг'
+    )
+    parser.add_argument(
+        '--last_page',
+        '--end_page',
+        default=4,
+        type=int,
+        help='Последняя страница для загрузки книг'
+    )
+    parser.add_argument(
+        '--dest_folder',
+        default='media',
+        type=str,
+        help='Путь к каталогу с результатами парсинга'
+    )
+    parser.add_argument(
+        '--json_path',
+        default='media',
+        type=str,
+        help='Путь к JSON файлу с результатами'
+    )
+    parser.add_argument(
+        '--skip_imgs',
+        action='store_true',
+        help='Не скачивать картинки'
+    )
+    parser.add_argument(
+        '--skip_txt',
+        action='store_true',
+        help='Не скачивать тексты книг'
+    )
     args = parser.parse_args()
-    Path(books_folder).mkdir(parents=True, exist_ok=True)
-    Path(images_folder).mkdir(parents=True, exist_ok=True)
-    url_list = get_books_urls(args.first_page, args.last_page)
+    Path(args.dest_folder).mkdir(parents=True, exist_ok=True)
+    Path(f'{args.dest_folder}/{books_folder}').mkdir(parents=True, exist_ok=True)
+    Path(f'{args.dest_folder}/{images_folder}').mkdir(parents=True, exist_ok=True)
+    books_urls = get_books_urls(args.first_page, args.last_page)
     books = list()
-    for url in url_list:
+    for url in books_urls:
         book_id = int(url.split('b')[1].split('/')[0])
         params = {
             'id': book_id
@@ -112,10 +147,12 @@ def main():
             check_for_redirect(response)
             book = parse_book_page(soup)
             book_title = book['title']
-            book_path = download_txt(response, book_title)
-            image_src = download_image(soup, url)
-            book['book_path'] = book_path
-            book['image_src'] = image_src
+            if not args.skip_txt:
+                book_path = download_txt(response, book_title, os.path.join(args.dest_folder, 'books'))
+                book['book_path'] = book_path
+            if not args.skip_imgs:
+                image_src = download_image(soup, url, os.path.join(args.dest_folder, 'images'))
+                book['image_src'] = image_src
             books.append(book)
         except requests.exceptions.HTTPError:
             print(f'Книги с id{book_id} не существует')
@@ -123,7 +160,7 @@ def main():
             print('Повторное подключение')
             sleep(20)
     books_json = json.dumps(books, ensure_ascii=False)
-    with open('books.json', 'w', encoding='utf8') as books_json_file:
+    with open(os.path.join(args.json_path, 'books.json'), 'w', encoding='utf8') as books_json_file:
         books_json_file.write(books_json)
 
 
