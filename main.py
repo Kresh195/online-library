@@ -6,21 +6,15 @@ import json
 
 import requests
 from pathlib import Path
-from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 
 from parse_tululu_category import get_books_urls
+from get_soup import get_soup
+
 
 def check_for_redirect(response):
     if response.history:
         raise requests.exceptions.HTTPError
-
-
-def get_book_soup(url):
-    response = requests.get(url)
-    response.raise_for_status()
-    soup = BeautifulSoup(response.text, 'lxml')
-    return soup
 
 
 def get_book_headers(soup):
@@ -44,8 +38,7 @@ def get_book_image_url(soup, url):
     return image_link
 
 
-def download_image(soup, url, folder='media/images/'):
-    image_link = get_book_image_url(soup, url)
+def download_image(image_link, folder='media/images/'):
     response = requests.get(image_link)
     response.raise_for_status()
     image_name = image_link.split('/')[-1]
@@ -141,7 +134,7 @@ def main():
             'id': book_id
         }
         response = requests.get(books_downloading_url, params=params)
-        soup = get_book_soup(url)
+        soup = get_soup(url)
         try:
             response.raise_for_status()
             check_for_redirect(response)
@@ -151,7 +144,8 @@ def main():
                 book_path = download_txt(response, book_title, os.path.join(args.dest_folder, 'books'))
                 book['book_path'] = book_path
             if not args.skip_imgs:
-                image_src = download_image(soup, url, os.path.join(args.dest_folder, 'images'))
+                image_link = get_book_image_url(soup, url)
+                image_src = download_image(image_link, os.path.join(args.dest_folder, 'images'))
                 book['image_src'] = image_src
             books.append(book)
         except requests.exceptions.HTTPError:
@@ -159,9 +153,8 @@ def main():
         except requests.exceptions.ConnectionError:
             print('Повторное подключение')
             sleep(20)
-    books_json = json.dumps(books, ensure_ascii=False)
     with open(os.path.join(args.json_path, 'books.json'), 'w', encoding='utf8') as books_json_file:
-        books_json_file.write(books_json)
+        json.dump(books, books_json_file, ensure_ascii=False, indent=4)
 
 
 if __name__ == "__main__":
