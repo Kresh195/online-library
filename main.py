@@ -129,9 +129,9 @@ def main():
         params = {
             'id': book_id
         }
-        response = requests.get(books_downloading_url, params=params)
         soup = get_soup(url)
         try:
+            response = requests.get(books_downloading_url, params=params)
             response.raise_for_status()
             check_for_redirect(response)
             book = parse_book_page(soup)
