@@ -10,11 +10,7 @@ from pathvalidate import sanitize_filename
 
 from parse_tululu_category import get_books_urls
 from get_soup import get_soup
-
-
-def check_for_redirect(response):
-    if response.history:
-        raise requests.exceptions.HTTPError
+from check_for_redirect import check_for_redirect
 
 
 def get_book_headers(soup):
