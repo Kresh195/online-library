@@ -8,6 +8,45 @@
 </head>
 <body>
   <div class="container">
+    <nav aria-label="...">
+      <ul class="pagination">
+
+        {% if current_page == 1 %}
+          <li class="page-item disabled">
+            <a class="page-link" tabindex="-1" aria-disabled="true">Предыдущая</a>
+          </li>
+        {% else %}
+          <li class="page-item">
+            <a class="page-link" href="index{{current_page - 1}}.html" tabindex="-1" aria-disabled="true">Предыдущая</a>
+          </li>
+        {% endif %}
+
+        {% for page_number in range(1, pages_count+1) %}
+          {% if page_number == current_page %}
+            <li class="page-item active" aria-current="page">
+              <span class="page-link">
+                {{ page_number }}
+                <span class="sr-only">(current)</span>
+              </span>
+            </li>
+          {% else %}
+            <li class="page-item"><a class="page-link" href="index{{page_number}}.html">{{page_number}}</a></li>
+          {% endif %}
+        {% endfor %}
+
+        {% if current_page == pages_count %}
+          <li class="page-item disabled">
+            <a class="page-link" href="#">Следующая</a>
+          </li>
+        {% else %}
+          <li class="page-item">
+            <a class="page-link" href="index{{current_page + 1}}.html">Следующая</a>
+          </li>
+        {% endif %}
+
+      </ul>
+    </nav>
+
     {% for books in chunked_books %}
       <div class="row">
         {% for book in books %}
@@ -21,7 +60,7 @@
                   <div class="card-body">
                     <h5 class="card-title">{{ book["title"] }}</h5>
                     <p class="card-text">{{ book["author"]}}</p>
-                    <a text="Читать" target="_blank" href="..\{{ book['book_path'] }}">Читать</a>
+                    <a target="_blank" href="..\{{ book['book_path'] }}">Читать</a>
                     <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
                   </div>
                 </div>
@@ -31,6 +70,7 @@
         {% endfor %}
       </div>
     {% endfor %}
+
   </div>
 </body>
 </html>
