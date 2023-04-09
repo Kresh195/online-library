@@ -39,6 +39,9 @@ python main.py --start_page 3 --end_page 4 --skip_imgs
 ```
 (Скачает книги со страницы 3 и 4, книги скачаются без обложек)
 
+[Пример полученного сайта](https://kresh195.github.io/online-library/docs/index1.html)
+
+
 # Цель проекта
 Код написан в образовательных целях на онлайн-курсе для веб-разработчиков
 [dvmn.org](https://dvmn.org).
