@@ -20,7 +20,7 @@ def render_page(env):
             chunked_books=chunked_books,
             current_page=page
         )
-        with open(f"Pages/index{page}.html", "w", encoding="UTF8") as file:
+        with open(f"docs/index{page}.html", "w", encoding="UTF8") as file:
             file.write(rendered_page)
 
 
@@ -29,7 +29,7 @@ def main():
         loader=FileSystemLoader('.'),
         autoescape=select_autoescape(['html', 'xml'])
     )
-    os.makedirs("Pages", exist_ok=True)
+    os.makedirs("docs", exist_ok=True)
     render_page(env)
 
 
