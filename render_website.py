@@ -25,12 +25,12 @@ def render_page(pages_count, chunked_books, page):
         chunked_books=chunked_books,
         current_page=page
     )
-    with open(f"docs/index{page}.html", "w", encoding="UTF8") as file:
+    with open(f"pages/index{page}.html", "w", encoding="UTF8") as file:
         file.write(rendered_page)
 
 
 def main():
-    os.makedirs("docs", exist_ok=True)
+    os.makedirs("pages", exist_ok=True)
     with open("media/books.json", "r", encoding="UTF8") as file:
         books = file.read()
     books = json.loads(books)
