@@ -67,14 +67,14 @@ def parse_book_page(soup):
     genres = get_book_genres(soup)
     comments = download_comments(soup)
     description = get_book_descriptions(soup)
-    book = {
+    book_description = {
         'title': title,
         'author': author,
         'genres': genres,
         'comments': comments,
         'description': description
     }
-    return book
+    return book_description
 
 
 def main():
@@ -123,7 +123,7 @@ def main():
     Path(f'{args.dest_folder}/{books_folder}').mkdir(parents=True, exist_ok=True)
     Path(f'{args.dest_folder}/{images_folder}').mkdir(parents=True, exist_ok=True)
     books_urls = get_books_urls(args.first_page, args.last_page)
-    books = list()
+    books_descriptions = list()
     for url in books_urls:
         book_id = int(url.split('b')[1].split('/')[0])
         params = {
@@ -134,23 +134,23 @@ def main():
             response = requests.get(books_downloading_url, params=params)
             response.raise_for_status()
             check_for_redirect(response)
-            book = parse_book_page(soup)
-            book_title = book['title']
+            book_description = parse_book_page(soup)
+            book_title = book_description['title']
             if not args.skip_txt:
                 book_path = download_txt(response, book_title, os.path.join(args.dest_folder, 'books'))
-                book['book_path'] = book_path
+                book_description['book_path'] = book_path
             if not args.skip_imgs:
                 image_link = get_book_image_url(soup, url)
                 image_src = download_image(image_link, os.path.join(args.dest_folder, 'images'))
-                book['image_src'] = image_src
-            books.append(book)
+                book_description['image_src'] = image_src
+            books_descriptions.append(book_description)
         except requests.exceptions.HTTPError:
             print(f'Книги с id{book_id} не существует')
         except requests.exceptions.ConnectionError:
             print('Повторное подключение')
             sleep(20)
     with open(os.path.join(args.json_path, 'books.json'), 'w', encoding='utf8') as books_json_file:
-        json.dump(books, books_json_file, ensure_ascii=False, indent=4)
+        json.dump(books_descriptions, books_json_file, ensure_ascii=False, indent=4)
 
 
 if __name__ == "__main__":
