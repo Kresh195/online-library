@@ -42,8 +42,7 @@ def main():
 
     os.makedirs("pages", exist_ok=True)
     with open(os.path.join(args.json_path, 'books.json'), "r", encoding="UTF8") as file:
-        books = file.read()
-    books = json.loads(books)
+        books = json.load(file)
     books_on_page = 10
     pages_books = list(chunked(books, books_on_page))
     on_reload(pages_books)
