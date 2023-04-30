@@ -42,6 +42,10 @@ python main.py --start_page 3 --end_page 4 --skip_imgs
 ```sh
 python render_website.py
 ```
+Если вы указывали свой путь к JSON файлу:
+```sh
+python render_website.py --json_path 'ваш путь'
+```
 Адрес вашего локального сайта: http://127.0.0.1:5500
 
 [Пример полученного сайта](https://kresh195.github.io/online-library)

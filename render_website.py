@@ -1,5 +1,6 @@
 import json
 import os
+import argparse
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from livereload import Server, shell
@@ -30,8 +31,17 @@ def render_page(pages_count, chunked_books, page):
 
 
 def main():
+    parser = argparse.ArgumentParser(description='Программа запускает локальный сайт')
+    parser.add_argument(
+        '--json_path',
+        default='media',
+        type=str,
+        help='Путь к JSON файлу с результатами'
+    )
+    args = parser.parse_args()
+
     os.makedirs("pages", exist_ok=True)
-    with open("media/books.json", "r", encoding="UTF8") as file:
+    with open(os.path.join(args.json_path, 'books.json'), "r", encoding="UTF8") as file:
         books = file.read()
     books = json.loads(books)
     books_on_page = 10
