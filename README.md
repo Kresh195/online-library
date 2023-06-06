@@ -50,7 +50,7 @@ JSON_PATH="путь к файлу"
 ```
 Адрес вашего локального сайта: http://127.0.0.1:5500
 
-[Пример полученного сайта](https://kresh195.github.io/online-library)
+[Пример полученного сайта](https://kresh195.github.io/online-library/pages/index1.html)
 
 
 # Цель проекта
