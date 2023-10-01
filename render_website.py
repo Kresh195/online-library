@@ -7,7 +7,7 @@ from more_itertools import chunked
 from dotenv import load_dotenv
 
 
-JSON_PATH = os.getenv("JSON_PATH", default="media")
+JSON_PATH = os.getenv("JSON_PATH", default="media/books.json")
 
 
 def on_reload():
@@ -24,10 +24,10 @@ def on_reload():
 
 def render_page(pages_count, chunked_books, page):
     env = Environment(
-        loader=FileSystemLoader('.'),
-        autoescape=select_autoescape(['html', 'xml'])
+        loader=FileSystemLoader("."),
+        autoescape=select_autoescape(["html", "xml"])
     )
-    template = env.get_template('./template.html')
+    template = env.get_template("./template.html")
     rendered_page = template.render(
         pages_count=pages_count,
         chunked_books=chunked_books,
@@ -44,8 +44,8 @@ def main():
     on_reload()
 
     server = Server()
-    server.watch('*.html', on_reload)
-    server.serve(root='.')
+    server.watch("*.html", on_reload)
+    server.serve(root=".")
 
 
 if __name__ == "__main__":
