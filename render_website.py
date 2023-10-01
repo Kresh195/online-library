@@ -3,7 +3,6 @@ import os
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from livereload import Server
-from urllib.parse import quote
 from more_itertools import chunked
 from dotenv import load_dotenv
 
@@ -19,9 +18,6 @@ def on_reload():
     pages_count = len(pages_books)
     columns_number = 2
     for page, page_books in enumerate(pages_books, 1):
-        for book in page_books:
-            book["image_src"] = quote(book["image_src"], safe="/")
-            book["book_path"] = quote(book["book_path"], safe="/")
         chunked_books = chunked(page_books, columns_number)
         render_page(pages_count, chunked_books, page)
 
