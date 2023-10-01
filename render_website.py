@@ -11,7 +11,7 @@ JSON_PATH = os.getenv("JSON_PATH", default="media")
 
 
 def on_reload():
-    with open(os.path.join(JSON_PATH, 'books.json'), "r", encoding="UTF8") as file:
+    with open(JSON_PATH, "r", encoding="UTF8") as file:
         books_descriptions = json.load(file)
     books_on_page = 10
     pages_books = list(chunked(books_descriptions, books_on_page))
